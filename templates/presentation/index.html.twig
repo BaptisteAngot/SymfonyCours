@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PresentationController!{% endblock %}
+
+{% block body %}
+    Je m'appelle Baptiste Angot, j'ai 22 ans et je suis développeur web back-end.
+    <ul>
+        {% for prenom, index in prenoms %}
+            {% if loop.first %}
+                <strong>
+            {% elseif loop.last %}
+                <span style="color: red">
+            {% endif %}
+            Je suis {{ prenom | upper }}, j'ai {{ index }} ans
+            Je suis {{ prenom | lower }}, j'ai {{ index }} ans
+            <br>
+            {% if loop.last %}
+            </span>
+            {% endif %}
+            {% if loop.first %}
+                </strong>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block footer %}
+    footer de presentation
+{% endblock %}
