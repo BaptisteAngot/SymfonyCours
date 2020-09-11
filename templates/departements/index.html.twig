@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DepartementsController!{% endblock %}
+
+{% block body %}
+    <div class="container">
+        Voici tous les déparetements : <br/><br/>
+        {% for departement in departements %}
+            <div class="row">
+                <div class="col-sm">
+                    Le département {{ departement.name }}
+                </div>
+                <div class="col-sm">
+                    Population de  {{ departement.population | number_format(0, ',', ' ') }} habitants
+                </div>
+                <div class="col-sm">
+                    {% for image in departement.images %}
+                        <img width="100" height="100" src="{{ image.url }}" alt="{{ image.caption }}">
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
