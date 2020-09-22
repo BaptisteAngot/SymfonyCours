@@ -27,7 +27,7 @@ class Departements
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer", nullable=false)
      */
     private $numero;
 

@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
 
 class DepartementsController extends AbstractController
 {
@@ -71,6 +72,44 @@ class DepartementsController extends AbstractController
     public function jsongetdepartementbynumero(Departements $departement)
     {
         return JsonResponse::fromJsonString($this->serializeDepartement($departement));
+    }
+
+    /**
+     * @Route("/v2/json/departments", name="jsonv2Departments", methods={"GET"} )
+     */
+    public function jsonv2Departments(Request $request, DepartementsRepository $departementsRepository)
+    {
+        $filter = [];
+        $em = $this->getDoctrine()->getManager();
+        $metaData = $em->getClassMetadata(Departements::class)->getFieldNames();
+        foreach ($metaData as $value) {
+            $filter[$value] = $request->query->get($value);
+        }
+        return JsonResponse::fromJsonString($this->serializeDepartement($departementsRepository->findBy($filter)));
+    }
+
+    /**
+     * @Route("/v2/json/departments", name="department_create", methods={"POST"})
+     * @param Request $request
+     * @return Response
+     */
+    public function departmentCreate(Request $request){
+        $entityManager = $this->getDoctrine()->getManager();
+        $nom = $request->request->get('name');
+
+        $departement = new Departements();
+        $departement->setName($request->request->get('name','undefined'))
+            ->setNumero($request->request->get('numero',0))
+            ->setDensite($request->request->get('densite',0))
+            ->setDescriptions($request->request->get('descriptions','undefined'))
+            ->setSuperficie($request->request->get('densite',0));
+
+        $entityManager->persist($departement);
+        $entityManager->flush();
+
+        $response = new Response();
+        $response->setContent("Creation of department with id " . $departement->getId());
+        return $response;
     }
 
     private function serializeDepartement($objet){
