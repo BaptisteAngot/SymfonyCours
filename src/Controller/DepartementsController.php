@@ -34,23 +34,10 @@ class DepartementsController extends AbstractController
     public function indexJson(DepartementsRepository $departementsRepository)
     {
         $departements = $departementsRepository->findAll();
-        $encoder = new JsonEncoder();
-        $defaultContext = [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object, $format, $context) {
-                return $object->getName();
-            },
-        ];
-        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
-        $serializer = new Serializer([$normalizer], [$encoder]);
-
-        $jsonContent = $serializer->serialize($departements, 'json');
-
-
-        $response = new JsonResponse($jsonContent);
-        $response->setStatusCode(Response::HTTP_OK);
+        $jsonContent = $this->serializeDepartement($departements);
         $response = JsonResponse::fromJsonString($jsonContent);
+        $response->setStatusCode(Response::HTTP_OK);
         return $response;
-//        return new JsonResponse($departementsRepository->findAllDepartements());
     }
 
     /**
@@ -64,27 +51,37 @@ class DepartementsController extends AbstractController
         ]);
     }
 
+
+
     /**
      * @Route("/departements/json/{slug}", name="jsongetdepartementbyslug")
+     * @param Departements $departement
+     * @return JsonResponse
      */
-    public function jsongetdepartementbyslug(string $slug,DepartementsRepository $departementsRepository)
+    public function jsongetdepartementbyslug(Departements $departement)
     {
-        $departements = $departementsRepository->findBy(['slug'=>$slug]);
-        $encoder = new JsonEncoder();
+        return JsonResponse::fromJsonString($this->serializeDepartement($departement));
+    }
+
+    /**
+     * @Route("/departements/json/numero/{numero}", name="jsongetdepartementbynumero")
+     * @param Departements $departement
+     * @return JsonResponse
+     */
+    public function jsongetdepartementbynumero(Departements $departement)
+    {
+        return JsonResponse::fromJsonString($this->serializeDepartement($departement));
+    }
+
+    private function serializeDepartement($objet){
         $defaultContext = [
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object, $format, $context) {
-                return $object->getName();
+                return $object->getSlug();
             },
         ];
         $normalizer = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
-        $serializer = new Serializer([$normalizer], [$encoder]);
+        $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
 
-        $jsonContent = $serializer->serialize($departements, 'json');
-
-
-        $response = new JsonResponse($jsonContent);
-        $response->setStatusCode(Response::HTTP_OK);
-        $response = JsonResponse::fromJsonString($jsonContent);
-        return $response;
+        return $serializer->serialize($objet, 'json');
     }
 }
