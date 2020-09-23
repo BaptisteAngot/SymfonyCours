@@ -29,7 +29,7 @@ class DepartementsController extends AbstractController
     }
 
     /**
-     * @Route("/departements/json", name="indexJson")
+     * @Route("/api/departements/json", name="indexJson")
      * @param DepartementsRepository $departementsRepository
      */
     public function indexJson(DepartementsRepository $departementsRepository)
@@ -75,7 +75,7 @@ class DepartementsController extends AbstractController
     }
 
     /**
-     * @Route("/v2/json/departments", name="jsonv2Departments", methods={"GET"} )
+     * @Route("/api/v2/json/departments", name="jsonv2Departments", methods={"GET"} )
      */
     public function jsonv2Departments(Request $request, DepartementsRepository $departementsRepository)
     {
@@ -83,7 +83,9 @@ class DepartementsController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $metaData = $em->getClassMetadata(Departements::class)->getFieldNames();
         foreach ($metaData as $value) {
-            $filter[$value] = $request->query->get($value);
+            if ($request->query->get($value)) {
+                $filter[$value] = $request->query->get($value);
+            }
         }
         return JsonResponse::fromJsonString($this->serializeDepartement($departementsRepository->findBy($filter)));
     }
