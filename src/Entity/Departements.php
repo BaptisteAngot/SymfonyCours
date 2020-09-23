@@ -57,7 +57,7 @@ class Departements
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="departement")
+     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="departement", cascade={"persist","remove"})
      */
     private $images;
 

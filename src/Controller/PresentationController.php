@@ -16,7 +16,7 @@ class PresentationController extends AbstractController
         $prenoms = ["Alicia" => 42, "Wejdene" => 16, "Maitre Gims" => 39];
         $age = 18;
 
-        return $this->render('presentation/index.html.twig', [
+        return $this->render('presentation/login.html.twig', [
             'controller_name' => 'PresentationController',
             'prenoms' => $prenoms,
             'age' => $age
@@ -28,7 +28,7 @@ class PresentationController extends AbstractController
      */
     public function cv($ecole)
     {
-        return $this->render('cv/index.html.twig', [
+        return $this->render('cv/login.html.twig', [
             'controller_name' => 'PresentationController',
             'ecole' => $ecole
         ]);
@@ -39,7 +39,7 @@ class PresentationController extends AbstractController
      */
     public function nfactory()
     {
-        return $this->render('nfactory/index.html.twig', [
+        return $this->render('nfactory/login.html.twig', [
             'controller_name' => 'PresentationController',
         ]);
     }

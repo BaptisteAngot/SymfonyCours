@@ -18,11 +18,11 @@ use Symfony\Component\HttpFoundation\Request;
 class DepartementsController extends AbstractController
 {
     /**
-     * @Route("/departements", name="departements")
+     * @Route("/api/departements", name="departements")
      */
     public function index(DepartementsRepository $departementsRepository)
     {
-        return $this->render('departements/index.html.twig', [
+        return $this->render('departements/login.html.twig', [
             'controller_name' => 'PresentationController',
             'departements' => $departementsRepository->findAll()
         ]);
@@ -46,7 +46,7 @@ class DepartementsController extends AbstractController
      */
     public function getdepartementbyslug(string $slug,DepartementsRepository $departementsRepository)
     {
-        return $this->render('departements/index.html.twig', [
+        return $this->render('departements/login.html.twig', [
             'controller_name' => 'PresentationController',
             'departements' => $departementsRepository->findBy(['slug' => $slug])
         ]);
@@ -109,6 +109,66 @@ class DepartementsController extends AbstractController
 
         $response = new Response();
         $response->setContent("Creation of department with id " . $departement->getId());
+        return $response;
+    }
+    /**
+     * @Route("/v2/json/departments/patch", name="departmentUpdate", methods={"PATCH"})
+     * @param Request $request
+     * @return Response
+     */
+    public function departmentUpdate(Request $request, DepartementsRepository $departementsRepository){
+        $entityManager = $this->getDoctrine()->getManager();
+        $data = json_decode(
+            $request->getContent(),
+            true
+        );
+        $response = new Response();
+        if (isset($data['departement_id']) && isset($data['name'])) {
+            $id = $data['departement_id'];
+            $departement = $departementsRepository->find($id);
+            if ($departement === null) {
+                $response->setContent("Ce département n'existe pas");
+                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            } else {
+                $departement->setName($data['name']);
+                $entityManager->persist($departement);
+                $entityManager->flush();
+                $response->setContent("Modification du département");
+                $response->setStatusCode(Response::HTTP_OK);
+            }
+        }else{
+            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
+        return $response;
+    }
+
+    /**
+     * @Route("/v2/json/departments/delete", name="departmentDelete", methods={"DELETE"})
+     * @param Request $request
+     * @return Response
+     */
+    public function departmentDelete(Request $request, DepartementsRepository $departementsRepository){
+        $entityManager = $this->getDoctrine()->getManager();
+        $data = json_decode(
+            $request->getContent(),
+            true
+        );
+        $response = new Response();
+        if (isset($data['departement_id'])) {
+            $id = $data['departement_id'];
+            $departement = $departementsRepository->find($id);
+            if ($departement === null) {
+                $response->setContent("Ce département n'existe pas");
+                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            } else {
+                $entityManager->remove($departement);
+                $entityManager->flush();
+                $response->setContent("Suppression du département");
+                $response->setStatusCode(Response::HTTP_OK);
+            }
+        }else {
+            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        }
         return $response;
     }
 
