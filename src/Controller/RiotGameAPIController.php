@@ -54,13 +54,16 @@ class RiotGameAPIController extends AbstractController
         $lastMatch = json_decode($lastMatch->getContent(),true);
         $result = array_slice($lastMatch["matches"],0,20);
         //construction JSON
-        $totalMatch = [];
+        $tmatch = [];
+        $totalMatch = [
+            "matches" => $tmatch
+        ];
 
         //TO DO GET MATCH
         foreach ($result as $match) {
             $match = $this->getInfoMatchByID($match["gameId"]);
             $match = json_decode($match->getContent(),true);
-            array_push($totalMatch,$match);
+            array_push($totalMatch["matches"],$match);
         }
         $normalizer = new ObjectNormalizer();
         $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
